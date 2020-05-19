@@ -89,6 +89,7 @@ app.get('/ideas/edit/:id', (req, res) => {
     
 });
 
+
 // process Form
 app.post('/ideas', (req, res) => {
   let errors = [];
@@ -117,8 +118,23 @@ app.post('/ideas', (req, res) => {
 });
 
 // Edit Form
-app.put('ideas/:id', (req, res) => {
-  res.send('PUT');
+app.put('/ideas/:id', (req, res) => {
+ Idea.findOne({
+   _id: req.params.id
+})
+.then(idea  => {
+// new values
+idea.title = req.body.title;
+idea.details = req.body.details;
+
+idea.save()
+  .then(
+    idea => {
+     res.redirect('/ideas');
+    }
+  )
+
+})
 });
 
 const port = 5000;
