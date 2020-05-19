@@ -1,6 +1,8 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const methodOverride = require('method-override');
+const flash = require('connect-flash');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
@@ -41,6 +43,25 @@ app.use(bodyParser.json());
 
 // Method Override Middleware
 app.use(methodOverride('_method'));
+
+// express session middleware
+app.use(session({
+  secret: 'secret',
+  resave: true,
+  saveUninitialized: true
+}));
+
+// connect flash middleware
+app.use(flash());
+
+
+// global variables
+app.use(function(req, res, next){
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
 
 // index route
 app.get('/', (req, res)=> {
@@ -135,6 +156,14 @@ idea.save()
   )
 
 })
+});
+
+// delete idea
+app.delete('/ideas/:id', (req, res) => {
+ Idea.deleteOne({_id: req.params.id})
+  .then(() => {
+    res.redirect('/ideas');
+  });
 });
 
 const port = 5000;
